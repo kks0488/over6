@@ -1,6 +1,10 @@
 export const MODELS = {
   default: process.env.OPENAI_MODEL || "gpt-5.2",
-  strong: process.env.OPENAI_MODEL_STRONG || "gpt-5.3-codex",
+} as const
+
+export const REASONING_EFFORT = {
+  default: "high",
+  sixth: "xhigh",
 } as const
 
 export const PHILOSOPHER_COLORS: Record<number, string> = {

@@ -1,6 +1,6 @@
 import { chatCompletionJSON } from "@/lib/ai/client"
 import type { DebateMessage, SocratesMeta, SixthRebuttal } from "@/lib/types"
-import { MODELS } from "@/lib/constants"
+import { REASONING_EFFORT } from "@/lib/constants"
 
 const SIXTH_AI_SYSTEM_PROMPT = `# 제6의 AI: 면벽자 + 소수의견자
 
@@ -80,6 +80,6 @@ ${debateTranscript}
   return chatCompletionJSON<SixthRebuttal>(
     SIXTH_AI_SYSTEM_PROMPT,
     userMessage,
-    { model: MODELS.strong, temperature: 0.9, maxTokens: 2048 }
+    { temperature: 0.9, maxTokens: 2048, reasoningEffort: REASONING_EFFORT.sixth }
   )
 }

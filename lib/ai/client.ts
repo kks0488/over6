@@ -1,17 +1,29 @@
 import OpenAI from "openai"
-import { MODELS } from "@/lib/constants"
+import type { ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions"
+import { MODELS, REASONING_EFFORT } from "@/lib/constants"
 
 export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   baseURL: process.env.OPENAI_BASE_URL,
 })
 
+interface CompletionOptions {
+  model?: string
+  temperature?: number
+  maxTokens?: number
+  reasoningEffort?: string
+}
+
+type CreateParams = ChatCompletionCreateParamsNonStreaming & {
+  reasoning?: { effort: string }
+}
+
 export async function chatCompletion(
   systemPrompt: string,
   userMessage: string,
-  options?: { model?: string; temperature?: number; maxTokens?: number }
+  options?: CompletionOptions
 ): Promise<string> {
-  const response = await openai.chat.completions.create({
+  const params: CreateParams = {
     model: options?.model || MODELS.default,
     messages: [
       { role: "system", content: systemPrompt },
@@ -19,14 +31,16 @@ export async function chatCompletion(
     ],
     temperature: options?.temperature ?? 0.8,
     max_tokens: options?.maxTokens ?? 1024,
-  })
+    reasoning: { effort: options?.reasoningEffort || REASONING_EFFORT.default },
+  }
+  const response = await openai.chat.completions.create(params as ChatCompletionCreateParamsNonStreaming)
   return response.choices[0]?.message?.content || ""
 }
 
 export async function chatCompletionJSON<T>(
   systemPrompt: string,
   userMessage: string,
-  options?: { model?: string; temperature?: number; maxTokens?: number }
+  options?: CompletionOptions
 ): Promise<T> {
   const fullSystemPrompt =
     systemPrompt +
@@ -35,7 +49,7 @@ export async function chatCompletionJSON<T>(
   let content: string
 
   try {
-    const response = await openai.chat.completions.create({
+    const params: CreateParams = {
       model: options?.model || MODELS.default,
       messages: [
         { role: "system", content: fullSystemPrompt },
@@ -44,11 +58,13 @@ export async function chatCompletionJSON<T>(
       temperature: options?.temperature ?? 0.7,
       max_tokens: options?.maxTokens ?? 2048,
       response_format: { type: "json_object" },
-    })
+      reasoning: { effort: options?.reasoningEffort || REASONING_EFFORT.default },
+    }
+    const response = await openai.chat.completions.create(params as ChatCompletionCreateParamsNonStreaming)
     content = response.choices[0]?.message?.content || "{}"
   } catch {
     // Fallback: some OpenAI-compatible APIs don't support response_format
-    const response = await openai.chat.completions.create({
+    const params: CreateParams = {
       model: options?.model || MODELS.default,
       messages: [
         { role: "system", content: fullSystemPrompt },
@@ -56,7 +72,9 @@ export async function chatCompletionJSON<T>(
       ],
       temperature: options?.temperature ?? 0.7,
       max_tokens: options?.maxTokens ?? 2048,
-    })
+      reasoning: { effort: options?.reasoningEffort || REASONING_EFFORT.default },
+    }
+    const response = await openai.chat.completions.create(params as ChatCompletionCreateParamsNonStreaming)
     content = response.choices[0]?.message?.content || "{}"
   }
 
