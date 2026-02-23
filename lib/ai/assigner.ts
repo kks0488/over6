@@ -1,7 +1,8 @@
 import { chatCompletionJSON } from "@/lib/ai/client"
 import type { Philosopher, PhilosophyTradition, SocratesMeta } from "@/lib/types"
 import { TRADITIONS, type TraditionDefinition } from "@/lib/philosophers/traditions"
-import { findMaxDisagreementCombination } from "@/lib/philosophers/disagreement-matrix"
+import { getCombinations, calculateDisagreementScore } from "@/lib/philosophers/disagreement-matrix"
+import { checkAxisCoverage } from "@/lib/philosophers/axes"
 import { PERSONA_TEMPLATES } from "@/lib/philosophers/templates"
 import { PHILOSOPHER_COLORS } from "@/lib/constants"
 
@@ -51,7 +52,7 @@ async function scoreRelevance(
 평가 기준:
 - 해당 전통이 이 주제에 대해 독특하고 의미 있는 관점을 제시할 수 있는가?
 - 해당 전통의 핵심 개념이 이 딜레마와 직접 연결되는가?
-- 해당 전통이 다른 전통과 풍성한 대립 구도를 만들 수 있는가?
+- 해당 전통이 이 질문에 대해 다른 전통과 구별되는 고유한 통찰을 가지고 있는가?
 
 철학 전통 목록:
 ${traditionList}
@@ -81,6 +82,46 @@ function filterTopTraditions(
     .sort((a, b) => b[1] - a[1])
     .slice(0, count)
     .map(([tradition]) => tradition)
+}
+
+const CATEGORY_DIVERSITY_BONUS = 0.3
+
+function findBestCombination(
+  candidates: PhilosophyTradition[],
+  selectCount: number = 5,
+): PhilosophyTradition[] {
+  const combinations = getCombinations(candidates, selectCount)
+
+  let bestScore = -1
+  let bestCombination: PhilosophyTradition[] = []
+
+  for (const combo of combinations) {
+    // Base: disagreement score
+    let score = calculateDisagreementScore(combo)
+
+    // Hard constraint: axis coverage (4 axes must have both + and - representation)
+    const tradDefs = combo.map((t) => TRADITIONS[t])
+    const coverage = checkAxisCoverage(tradDefs)
+    if (!coverage.covered) {
+      // Penalty proportional to missing axes, but don't completely eliminate
+      score *= 0.5 * (coverage.coveredCount / coverage.totalAxes)
+    }
+
+    // Bonus: category diversity (western + eastern + modern all represented)
+    const categories = new Set(combo.map((t) => TRADITIONS[t].category))
+    if (categories.size >= 3) {
+      score += CATEGORY_DIVERSITY_BONUS
+    } else if (categories.size >= 2) {
+      score += CATEGORY_DIVERSITY_BONUS * 0.5
+    }
+
+    if (score > bestScore) {
+      bestScore = score
+      bestCombination = combo
+    }
+  }
+
+  return bestCombination
 }
 
 async function generatePersonaStances(
@@ -141,11 +182,9 @@ export async function assignPhilosophers(
   // Step 3: Filter top 7-8 (code only)
   const topTraditions = filterTopTraditions(scores, 8)
 
-  // Step 4: Optimize combination for maximum disagreement (code only)
-  const { traditions: selectedTraditions } = findMaxDisagreementCombination(
-    topTraditions,
-    5
-  )
+  // Step 4: Optimize combination with multi-objective scoring (code only)
+  // Objectives: disagreement + axis coverage (hard constraint) + category diversity (bonus)
+  const selectedTraditions = findBestCombination(topTraditions, 5)
 
   // Step 5: Generate stances (1 LLM call)
   const stances = await generatePersonaStances(

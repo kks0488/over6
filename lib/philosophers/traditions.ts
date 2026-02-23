@@ -67,12 +67,12 @@ export const TRADITIONS: Record<PhilosophyTradition, TraditionDefinition> = {
 
   skepticism: {
     id: "skepticism",
-    name: "회의론",
+    name: "회의주의",
     nameEn: "Skepticism",
     category: "western",
-    coreView: "모든 전제와 확실성을 의심한다. 참된 지식에 도달하려면 끊임없이 질문하고 검증해야 한다.",
-    representative: "데카르트 / 흄",
-    keywords: ["의심", "회의", "검증", "전제", "불확실성", "비판"],
+    coreView: "모든 주장의 근거를 끝까지 요구하며, 충분한 근거가 없으면 판단을 유보(에포케)한다. 앎의 한계를 드러내는 것이 목적이다.",
+    representative: "몽테뉴 / 흄",
+    keywords: ["판단유보", "에포케", "근거", "귀납문제", "불확실성", "전제"],
     axes: {
       resultVsPrinciple: 0.0,
       individualVsCollective: 0.4,
@@ -102,8 +102,8 @@ export const TRADITIONS: Record<PhilosophyTradition, TraditionDefinition> = {
     name: "사회계약론",
     nameEn: "Social Contract Theory",
     category: "western",
-    coreView: "정의로운 사회는 무지의 베일 뒤에서 합의된 공정한 원칙에 기반한다. 제도가 개인의 자유와 평등을 보장해야 한다.",
-    representative: "롤스 / 홉스",
+    coreView: "정의로운 사회는 자유롭고 평등한 개인들이 공정한 조건에서 합의한 원칙에 기반한다. 무지의 베일 뒤에서 합의된 제도가 권리와 기회를 보장해야 한다.",
+    representative: "롤스 / 로크",
     keywords: ["계약", "정의", "제도", "공정", "합의", "권리"],
     axes: {
       resultVsPrinciple: -0.3,
@@ -156,7 +156,7 @@ export const TRADITIONS: Record<PhilosophyTradition, TraditionDefinition> = {
     axes: {
       resultVsPrinciple: -0.1,
       individualVsCollective: -0.3,
-      realismVsIdealism: -0.8,
+      realismVsIdealism: -0.6,
       certaintyVsDoubt: -0.6,
     },
   },
@@ -182,9 +182,9 @@ export const TRADITIONS: Record<PhilosophyTradition, TraditionDefinition> = {
     name: "비판이론",
     nameEn: "Critical Theory",
     category: "modern",
-    coreView: "모든 지식과 제도에는 권력관계가 내재해 있다. 보이지 않는 구조적 억압을 폭로하고 해방을 추구한다.",
-    representative: "하버마스 / 푸코",
-    keywords: ["권력", "구조", "비판", "해방", "담론", "이데올로기"],
+    coreView: "모든 지식과 제도에는 권력관계가 내재해 있다. 자연스러워 보이는 것일수록 의심하고, 구조적 억압을 폭로하여 해방을 추구한다.",
+    representative: "푸코 / 아도르노",
+    keywords: ["권력", "구조", "비판", "해방", "담론", "도구적 이성"],
     axes: {
       resultVsPrinciple: -0.2,
       individualVsCollective: -0.4,

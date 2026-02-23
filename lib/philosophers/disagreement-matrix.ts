@@ -7,16 +7,16 @@ import type { PhilosophyTradition } from "@/lib/types"
  * The matrix is symmetric: MATRIX[A][B] === MATRIX[B][A].
  *
  * Key historical rivalries:
- * - utilitarian <-> deontology = 0.95  (consequentialism vs duty, the foundational ethics divide)
+ * - utilitarian <-> deontology = 0.9   (consequentialism vs duty, the foundational ethics divide)
  * - daoism <-> legalism = 0.9          (wu-wei vs rigid control, ancient Chinese antipodes)
  * - existentialism <-> legalism = 0.85 (radical freedom vs systemic coercion)
- * - skepticism <-> confucianism = 0.8  (doubt everything vs uphold received tradition)
- * - buddhism <-> legalism = 0.8        (emptiness/non-attachment vs material incentives)
+ * - buddhism <-> legalism = 0.75       (emptiness/non-attachment vs material incentives)
+ * - skepticism <-> confucianism = 0.7  (doubt everything vs uphold received tradition)
  */
 export const DISAGREEMENT_MATRIX: Record<PhilosophyTradition, Record<PhilosophyTradition, number>> = {
   utilitarian: {
     utilitarian: 0,
-    deontology: 0.95,
+    deontology: 0.9,
     existentialism: 0.55,
     skepticism: 0.45,
     pragmatism: 0.2,
@@ -29,7 +29,7 @@ export const DISAGREEMENT_MATRIX: Record<PhilosophyTradition, Record<PhilosophyT
     care_ethics: 0.55,
   },
   deontology: {
-    utilitarian: 0.95,
+    utilitarian: 0.9,
     deontology: 0,
     existentialism: 0.6,
     skepticism: 0.7,
@@ -63,7 +63,7 @@ export const DISAGREEMENT_MATRIX: Record<PhilosophyTradition, Record<PhilosophyT
     skepticism: 0,
     pragmatism: 0.35,
     social_contract: 0.55,
-    confucianism: 0.8,
+    confucianism: 0.7,
     daoism: 0.45,
     buddhism: 0.35,
     legalism: 0.65,
@@ -95,14 +95,14 @@ export const DISAGREEMENT_MATRIX: Record<PhilosophyTradition, Record<PhilosophyT
     daoism: 0.7,
     buddhism: 0.55,
     legalism: 0.5,
-    critical_theory: 0.45,
+    critical_theory: 0.55,
     care_ethics: 0.4,
   },
   confucianism: {
     utilitarian: 0.5,
     deontology: 0.35,
     existentialism: 0.7,
-    skepticism: 0.8,
+    skepticism: 0.7,
     pragmatism: 0.45,
     social_contract: 0.45,
     confucianism: 0,
@@ -110,7 +110,7 @@ export const DISAGREEMENT_MATRIX: Record<PhilosophyTradition, Record<PhilosophyT
     buddhism: 0.45,
     legalism: 0.55,
     critical_theory: 0.65,
-    care_ethics: 0.25,
+    care_ethics: 0.4,
   },
   daoism: {
     utilitarian: 0.6,
@@ -121,7 +121,7 @@ export const DISAGREEMENT_MATRIX: Record<PhilosophyTradition, Record<PhilosophyT
     social_contract: 0.7,
     confucianism: 0.6,
     daoism: 0,
-    buddhism: 0.2,
+    buddhism: 0.3,
     legalism: 0.9,
     critical_theory: 0.5,
     care_ethics: 0.4,
@@ -134,9 +134,9 @@ export const DISAGREEMENT_MATRIX: Record<PhilosophyTradition, Record<PhilosophyT
     pragmatism: 0.6,
     social_contract: 0.55,
     confucianism: 0.45,
-    daoism: 0.2,
+    daoism: 0.3,
     buddhism: 0,
-    legalism: 0.8,
+    legalism: 0.75,
     critical_theory: 0.45,
     care_ethics: 0.3,
   },
@@ -149,7 +149,7 @@ export const DISAGREEMENT_MATRIX: Record<PhilosophyTradition, Record<PhilosophyT
     social_contract: 0.5,
     confucianism: 0.55,
     daoism: 0.9,
-    buddhism: 0.8,
+    buddhism: 0.75,
     legalism: 0,
     critical_theory: 0.6,
     care_ethics: 0.75,
@@ -160,7 +160,7 @@ export const DISAGREEMENT_MATRIX: Record<PhilosophyTradition, Record<PhilosophyT
     existentialism: 0.35,
     skepticism: 0.3,
     pragmatism: 0.5,
-    social_contract: 0.45,
+    social_contract: 0.55,
     confucianism: 0.65,
     daoism: 0.5,
     buddhism: 0.45,
@@ -175,7 +175,7 @@ export const DISAGREEMENT_MATRIX: Record<PhilosophyTradition, Record<PhilosophyT
     skepticism: 0.5,
     pragmatism: 0.4,
     social_contract: 0.4,
-    confucianism: 0.25,
+    confucianism: 0.4,
     daoism: 0.4,
     buddhism: 0.3,
     legalism: 0.75,

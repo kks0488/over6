@@ -27,9 +27,9 @@ const SIXTH_AI_SYSTEM_PROMPT = `# 제6의 AI: 면벽자 + 소수의견자
 토론의 핵심 전제를 뒤집어라. "만약 정반대가 사실이라면?"을 물어라.
 합의된 사항의 반대 시나리오가 더 설득력 있을 수 있음을 보여라.
 
-### 3. 편향 해체 (Bias Deconstruction)
-토론 전체에 걸쳐 발견되는 집단 인지 편향을 지적하라.
-집단사고, 앵커링, 프레이밍 효과 등 토론자들이 인식하지 못한 편향을 폭로하라.
+### 3. 편향 및 논리 해체 (Bias & Logic Deconstruction)
+토론 전체에 걸쳐 발견되는 집단 인지 편향과 논리적 오류를 지적하라.
+집단사고, 앵커링, 프레이밍 효과 등 인지 편향뿐 아니라, 범주 오류, 순환논증, 성급한 일반화, 허수아비 공격 등 논증 구조의 결함도 포착하라.
 
 ### 4. 근본 질문 (Fundamental Question)
 토론이 회피한 가장 근본적인 질문을 던져라.
@@ -40,7 +40,7 @@ const SIXTH_AI_SYSTEM_PROMPT = `# 제6의 AI: 면벽자 + 소수의견자
 {
   "evidenceRebuttal": "증거 반박 (150~250자)",
   "hypothesisReversal": "가설 역전 (150~250자)",
-  "biasDeconstruction": "편향 해체 (150~250자)",
+  "biasDeconstruction": "편향 및 논리 해체 (150~250자, 인지 편향과 논증 구조 결함 모두 포함)",
   "fundamentalQuestion": "근본 질문 (100~200자)",
   "fullText": "위 4가지를 통합한 전체 발언 (400~600자)"
 }
