@@ -2,7 +2,7 @@ import { create } from "zustand"
 import type {
   DebateStep,
   SocratesMeta,
-  Philosopher,
+  ClientPhilosopher,
   DebateMessage,
   SixthRebuttal,
   Report,
@@ -17,7 +17,7 @@ interface DebateState {
   progressLabel: string
   socratesMeta: SocratesMeta | null
   refinedQuestion: string | null
-  philosophers: Philosopher[]
+  philosophers: ClientPhilosopher[]
   messages: DebateMessage[]
   sixthRebuttal: SixthRebuttal | null
   report: Report | null
@@ -31,7 +31,7 @@ interface DebateActions {
   setProgress: (progress: number, label?: string) => void
   setSocratesMeta: (meta: SocratesMeta) => void
   setRefinedQuestion: (question: string) => void
-  setPhilosophers: (philosophers: Philosopher[]) => void
+  setPhilosophers: (philosophers: ClientPhilosopher[]) => void
   addMessage: (message: DebateMessage) => void
   setSixthRebuttal: (rebuttal: SixthRebuttal) => void
   setReport: (report: Report) => void

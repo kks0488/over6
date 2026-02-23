@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback } from "react"
 import { useDebateStore } from "@/stores/debate-store"
 import type {
   SocratesMeta,
-  Philosopher,
+  ClientPhilosopher,
   DebateMessage,
   SixthRebuttal,
   Report,
@@ -83,7 +83,7 @@ export function useDebateStream({
     })
 
     es.addEventListener("philosophers", (event) => {
-      const data = JSON.parse(event.data) as Philosopher[]
+      const data = JSON.parse(event.data) as ClientPhilosopher[]
       setPhilosophers(data)
     })
 
@@ -127,6 +127,7 @@ export function useDebateStream({
     return () => {
       es.close()
       eventSourceRef.current = null
+      hasStartedRef.current = false
     }
   }, [
     debateId,

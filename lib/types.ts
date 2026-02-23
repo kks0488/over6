@@ -34,6 +34,9 @@ export interface Philosopher {
   systemPrompt: string
 }
 
+/** Philosopher shape sent to the client (systemPrompt stripped by server) */
+export type ClientPhilosopher = Omit<Philosopher, "systemPrompt">
+
 export interface DebateMessage {
   id: string
   step: DebateStep
@@ -72,7 +75,7 @@ export interface DebateRecord {
   refinedQuestion: string | null
   socratesEnabled: boolean
   socratesMeta: SocratesMeta | null
-  philosophers: Philosopher[]
+  philosophers: ClientPhilosopher[]
   messages: DebateMessage[]
   sixthRebuttal: SixthRebuttal | null
   report: Report | null

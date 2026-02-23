@@ -40,7 +40,8 @@ async function generateRoundMessages(
   question: string,
   previousMessages: DebateMessage[],
   round: number,
-  onMessage: OnMessageCallback
+  onMessage: OnMessageCallback,
+  previousSummary: string | null
 ): Promise<DebateMessage[]> {
   const step = `round${round}` as "round1" | "round2" | "round3"
 
@@ -53,11 +54,15 @@ async function generateRoundMessages(
 
 이것은 첫 번째 발언이다. 다른 참여자의 의견을 참고하지 말고, 네 전통의 핵심 원리에 기반하여 논점을 제시하라.`
   } else if (round === 2) {
+    const summarySection = previousSummary
+      ? `## 이전 라운드 요약\n${previousSummary}\n\n`
+      : ""
+
     const prevContext = previousMessages
       .map((m) => `[${m.speakerName}]: ${m.content}`)
       .join("\n\n")
 
-    userPrompt = `다음은 이전 라운드에서 다른 철학자들이 제시한 의견이다:
+    userPrompt = `${summarySection}다음은 이전 라운드에서 다른 철학자들이 제시한 의견이다:
 
 ${prevContext}
 
@@ -66,11 +71,15 @@ ${prevContext}
 - 네 전통의 강점으로 상대의 약점을 공격하라.
 - 새로운 논거를 추가하라.`
   } else {
+    const summarySection = previousSummary
+      ? `## 이전 라운드 요약\n${previousSummary}\n\n`
+      : ""
+
     const prevContext = previousMessages
       .map((m) => `[${m.speakerName}] (${m.step}): ${m.content}`)
       .join("\n\n")
 
-    userPrompt = `다음은 지금까지의 전체 토론 내용이다:
+    userPrompt = `${summarySection}다음은 지금까지의 전체 토론 내용이다:
 
 ${prevContext}
 
@@ -144,6 +153,7 @@ export async function runDebate(
   onMessage: OnMessageCallback
 ): Promise<DebateResult> {
   const allMessages: DebateMessage[] = []
+  let previousSummary: string | null = null
 
   for (let round = 1; round <= DEBATE_ROUNDS; round++) {
     // Generate messages for this round (5 philosophers in parallel)
@@ -152,13 +162,14 @@ export async function runDebate(
       question,
       allMessages,
       round,
-      onMessage
+      onMessage,
+      previousSummary
     )
     allMessages.push(...roundMessages)
 
-    // Generate summary between rounds (not after the last round)
+    // Generate summary between rounds to feed into the next round
     if (round < DEBATE_ROUNDS) {
-      await generateSummary(allMessages, round)
+      previousSummary = await generateSummary(allMessages, round)
     }
   }
 

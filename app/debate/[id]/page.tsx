@@ -68,26 +68,26 @@ function DebateStreamContent() {
     saveDebate,
   ])
 
-  // Save error state too
+  // Save error state too — preserve accumulated data
   useEffect(() => {
     if (error && !hasSavedRef.current) {
       hasSavedRef.current = true
       const record: DebateRecord = {
         id: debateId,
         question,
-        refinedQuestion: null,
+        refinedQuestion: socratesMeta?.refinedQuestion ?? null,
         socratesEnabled,
-        socratesMeta: null,
-        philosophers: [],
-        messages: [],
-        sixthRebuttal: null,
+        socratesMeta,
+        philosophers,
+        messages,
+        sixthRebuttal,
         report: null,
         status: "error",
         createdAt: new Date().toISOString(),
       }
       saveDebate(record)
     }
-  }, [error, debateId, question, socratesEnabled, saveDebate])
+  }, [error, debateId, question, socratesEnabled, socratesMeta, philosophers, messages, sixthRebuttal, saveDebate])
 
   if (!question) {
     return (

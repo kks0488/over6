@@ -4,7 +4,7 @@ import { useRef, useEffect, useMemo } from "react"
 import type {
   DebateStep,
   SocratesMeta,
-  Philosopher,
+  ClientPhilosopher,
   DebateMessage as DebateMessageType,
   SixthRebuttal,
 } from "@/lib/types"
@@ -19,7 +19,7 @@ interface DebateTimelineProps {
   currentStep: DebateStep
   socratesEnabled: boolean
   socratesMeta: SocratesMeta | null
-  philosophers: Philosopher[]
+  philosophers: ClientPhilosopher[]
   messages: DebateMessageType[]
   sixthRebuttal: SixthRebuttal | null
   isStreaming: boolean

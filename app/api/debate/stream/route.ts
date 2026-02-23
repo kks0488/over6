@@ -4,7 +4,7 @@ import { runDebate } from "@/lib/ai/debate"
 import { runSixthAI } from "@/lib/ai/sixth-ai"
 import { generateReport } from "@/lib/ai/reporter"
 import { MAX_QUESTION_LENGTH } from "@/lib/constants"
-import type { SSEEventType, DebateMessage, Philosopher } from "@/lib/types"
+import type { SSEEventType, DebateMessage, Philosopher, ClientPhilosopher } from "@/lib/types"
 
 export const maxDuration = 300
 
@@ -27,7 +27,7 @@ function sendProgress(
   sendSSE(controller, encoder, "progress", { percent, label })
 }
 
-function stripSystemPrompt(philosopher: Philosopher): Omit<Philosopher, "systemPrompt"> & { systemPrompt?: undefined } {
+function stripSystemPrompt(philosopher: Philosopher): ClientPhilosopher {
   const { systemPrompt: _, ...rest } = philosopher
   return rest
 }
