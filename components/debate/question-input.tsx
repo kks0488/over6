@@ -20,14 +20,16 @@ interface QuestionInputProps {
   onSubmit: (question: string, socratesEnabled: boolean) => void
   disabled?: boolean
   remainingCount: number
+  defaultQuestion?: string
 }
 
 export function QuestionInput({
   onSubmit,
   disabled = false,
   remainingCount,
+  defaultQuestion = "",
 }: QuestionInputProps) {
-  const [question, setQuestion] = useState("")
+  const [question, setQuestion] = useState(defaultQuestion)
   const [socratesEnabled, setSocratesEnabled] = useState(true)
 
   const charCount = question.length
