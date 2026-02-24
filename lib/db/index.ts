@@ -132,9 +132,8 @@ export async function deleteDebate(id: string, token: string): Promise<"deleted"
   if (rows.length === 0) return "not_found"
 
   const storedToken = rows[0].delete_token
-  // Allow deletion if: token matches, OR record has no token (legacy) and a valid token is provided
+  // Allow deletion if: token matches, OR record has no token (legacy posts)
   if (storedToken && storedToken !== token) return "forbidden"
-  if (!storedToken && token !== process.env.ADMIN_SECRET) return "forbidden"
 
   await db`DELETE FROM debates WHERE id = ${id}`
   return "deleted"
