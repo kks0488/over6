@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import type { SocratesOption, SocratesAnalysisResult } from "@/lib/types"
-import { Zap, Compass, BookOpen, ArrowRight } from "lucide-react"
+import { Zap, Compass, BookOpen, ArrowRight, RotateCcw } from "lucide-react"
 
 interface SocratesOptionsProps {
   analysis: SocratesAnalysisResult
@@ -48,16 +48,25 @@ export function SocratesOptions({
   onSelect,
 }: SocratesOptionsProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
-  const [editedQuestion, setEditedQuestion] = useState("")
+  const [editedQuestion, setEditedQuestion] = useState(originalQuestion)
 
-  function handleOptionClick(index: number) {
+  function handleSuggestionClick(index: number) {
     setSelectedIndex(index)
-    if (index === -1) {
-      setEditedQuestion(originalQuestion)
+    setEditedQuestion(analysis.options[index].refinedQuestion)
+  }
+
+  function handleConfirm() {
+    if (!editedQuestion.trim()) return
+
+    if (selectedIndex === null || selectedIndex === -1) {
+      onSelect(null, editedQuestion)
     } else {
-      setEditedQuestion(analysis.options[index].refinedQuestion)
+      const option = analysis.options[selectedIndex]
+      onSelect({ ...option, refinedQuestion: editedQuestion }, editedQuestion)
     }
   }
+
+  const isModified = editedQuestion !== originalQuestion
 
   return (
     <motion.div
@@ -109,28 +118,43 @@ export function SocratesOptions({
         </div>
       </div>
 
-      {/* Options */}
+      {/* Editable Question — Always Visible */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
+            토론에 사용할 질문
+          </h3>
+          {isModified && (
+            <button
+              onClick={() => {
+                setEditedQuestion(originalQuestion)
+                setSelectedIndex(null)
+              }}
+              className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              <RotateCcw className="size-3" />
+              원래 질문으로
+            </button>
+          )}
+        </div>
+        <p className="text-xs text-zinc-500">
+          직접 수정하거나, 아래 제안을 클릭하여 질문을 변경하세요
+        </p>
+        <textarea
+          value={editedQuestion}
+          onChange={(e) => setEditedQuestion(e.target.value)}
+          rows={3}
+          className="w-full rounded-lg border border-indigo-500/30 bg-zinc-900 px-4 py-3 text-sm text-zinc-200 outline-none focus:border-indigo-500/60 resize-none"
+          placeholder="토론에 사용할 질문을 입력하세요..."
+        />
+      </div>
+
+      {/* Suggestion Options */}
       <div className="space-y-3">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
-          토론에 사용할 질문을 선택하세요
+          소크라테스 질문 제안
         </h3>
 
-        {/* Original question option */}
-        <button
-          onClick={() => handleOptionClick(-1)}
-          className={`w-full rounded-lg border p-4 text-left transition-all ${
-            selectedIndex === -1
-              ? "border-zinc-400/50 bg-zinc-700/20"
-              : "border-zinc-700/50 bg-[#1a1a1a] hover:border-zinc-600/50"
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-zinc-500">원래 질문 그대로</span>
-          </div>
-          <p className="mt-1 text-sm text-zinc-200">{originalQuestion}</p>
-        </button>
-
-        {/* Reframed options */}
         {analysis.options.map((option, i) => {
           const style = STYLE_CONFIG[option.style] || STYLE_CONFIG.exploratory
           const Icon = style.icon
@@ -142,7 +166,7 @@ export function SocratesOptions({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              onClick={() => handleOptionClick(i)}
+              onClick={() => handleSuggestionClick(i)}
               className={`w-full rounded-lg border p-4 text-left transition-all ${
                 isSelected
                   ? `${style.borderColor} ${style.selectedBg}`
@@ -169,40 +193,11 @@ export function SocratesOptions({
         })}
       </div>
 
-      {/* Edit area */}
-      {selectedIndex !== null && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          transition={{ duration: 0.2 }}
-          className="space-y-2 overflow-hidden"
-        >
-          <p className="text-xs text-zinc-500">
-            선택한 질문을 자유롭게 수정할 수 있습니다
-          </p>
-          <textarea
-            value={editedQuestion}
-            onChange={(e) => setEditedQuestion(e.target.value)}
-            rows={3}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-200 outline-none focus:border-indigo-500/50 resize-none"
-            placeholder="토론에 사용할 질문을 입력하세요..."
-          />
-        </motion.div>
-      )}
-
       {/* Confirm button */}
       <div className="flex justify-end">
         <Button
-          disabled={selectedIndex === null || !editedQuestion.trim()}
-          onClick={() => {
-            if (selectedIndex === null) return
-            if (selectedIndex === -1) {
-              onSelect(null, editedQuestion)
-            } else {
-              const option = analysis.options[selectedIndex]
-              onSelect({ ...option, refinedQuestion: editedQuestion }, editedQuestion)
-            }
-          }}
+          disabled={!editedQuestion.trim()}
+          onClick={handleConfirm}
           className="bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-40"
         >
           이 질문으로 토론 시작
