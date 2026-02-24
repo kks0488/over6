@@ -4,6 +4,7 @@ import type {
   SocratesMeta,
   SixthRebuttal,
   Report,
+  ReportConclusion,
 } from "@/lib/types"
 
 interface ReportInsights {
@@ -11,6 +12,7 @@ interface ReportInsights {
   thinkingQuestions: string[]
   missingPerspectives: string[]
   uncertaintyNote: string
+  conclusion: ReportConclusion
 }
 
 async function generateInsights(
@@ -45,12 +47,30 @@ async function generateInsights(
    - AI 토론의 구조적 한계 (실제 인간 경험 부재, 맥락 축소 등)
    - 이 보고서가 확정적 결론이 아닌 사고의 출발점임을 명시
 
+5. conclusion: 토론 결론을 구조화하여 생성
+   - positions: 토론에서 드러난 핵심 입장 정리 (2~4개)
+     각 position은:
+     - position: 입장 이름 (예: "공리주의적 접근", "의무론적 반대")
+     - strengths: 이 입장의 강점 (1문장)
+     - weaknesses: 이 입장의 약점 또는 한계 (1문장)
+     - uncertainty: 이 입장에서 확실하지 않은 부분 (1문장)
+   - unexploredDirections: 이 토론에서 다루지 못했지만 중요한 탐색 방향 2~3개 (각 1문장)
+   - reflectionNote: 독자에게 전하는 성찰 안내 (2~3문장)
+     - "최종 판단은 당신의 몫"이 아닌, 구체적으로 어떤 요소를 고려해야 하는지 안내
+     - 어떤 조건에서 어떤 입장이 더 설득력 있는지 힌트 제공
+     - 독자의 개인적 맥락(가치관, 상황, 우선순위)이 판단에 어떤 영향을 미치는지 언급
+
 JSON 형식:
 {
   "biasesFound": ["편향1", "편향2"],
   "thinkingQuestions": ["질문1", "질문2"],
   "missingPerspectives": ["빠진 관점1", "빠진 관점2"],
-  "uncertaintyNote": "이 보고서의 한계..."
+  "uncertaintyNote": "이 보고서의 한계...",
+  "conclusion": {
+    "positions": [{"position": "입장명", "strengths": "강점", "weaknesses": "약점", "uncertainty": "불확실"}],
+    "unexploredDirections": ["방향1"],
+    "reflectionNote": "성찰 안내"
+  }
 }`
 
   const socratesSection = socratesMeta
@@ -82,7 +102,7 @@ ${dissent.join("\n")}
 
   return chatCompletionJSON<ReportInsights>(systemPrompt, userMessage, {
     temperature: 0.6,
-    maxTokens: 1024,
+    maxTokens: 2048,
   })
 }
 
@@ -114,6 +134,6 @@ export async function generateReport(
     thinkingQuestions: insights.thinkingQuestions,
     missingPerspectives: insights.missingPerspectives,
     uncertaintyNote: insights.uncertaintyNote,
-    conclusion: "최종 판단은 당신의 몫입니다.",
+    conclusion: insights.conclusion,
   }
 }

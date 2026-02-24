@@ -87,13 +87,14 @@ function DebatePageContent() {
     }
   }
 
-  function handleOptionSelect(option: SocratesOption | null) {
+  function handleOptionSelect(option: SocratesOption | null, finalQuestion?: string) {
     if (!socratesAnalysis) return
     setPhase("starting")
 
     if (option === null) {
-      // User chose original question — no Socrates meta
-      startDebateWithParams(pendingQuestion, null)
+      // 원래 질문 사용 (수정됐을 수 있음)
+      const question = finalQuestion || pendingQuestion
+      startDebateWithParams(question, null)
     } else {
       const meta: SocratesMeta = {
         framing: socratesAnalysis.framing,

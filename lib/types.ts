@@ -74,6 +74,17 @@ export interface SixthRebuttal {
   fullText: string
 }
 
+export interface ReportConclusion {
+  positions: {
+    position: string
+    strengths: string
+    weaknesses: string
+    uncertainty: string
+  }[]
+  unexploredDirections: string[]
+  reflectionNote: string
+}
+
 export interface Report {
   originalQuestion: string
   refinedQuestion: string | null
@@ -85,7 +96,7 @@ export interface Report {
   thinkingQuestions: string[]
   missingPerspectives: string[]
   uncertaintyNote: string
-  conclusion: string
+  conclusion: ReportConclusion | string
 }
 
 export interface DebateRecord {

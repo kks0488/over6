@@ -9,7 +9,7 @@ import { Zap, Compass, BookOpen, ArrowRight } from "lucide-react"
 interface SocratesOptionsProps {
   analysis: SocratesAnalysisResult
   originalQuestion: string
-  onSelect: (option: SocratesOption | null) => void
+  onSelect: (option: SocratesOption | null, finalQuestion?: string) => void
 }
 
 const STYLE_CONFIG = {
@@ -48,6 +48,16 @@ export function SocratesOptions({
   onSelect,
 }: SocratesOptionsProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+  const [editedQuestion, setEditedQuestion] = useState("")
+
+  function handleOptionClick(index: number) {
+    setSelectedIndex(index)
+    if (index === -1) {
+      setEditedQuestion(originalQuestion)
+    } else {
+      setEditedQuestion(analysis.options[index].refinedQuestion)
+    }
+  }
 
   return (
     <motion.div
@@ -107,7 +117,7 @@ export function SocratesOptions({
 
         {/* Original question option */}
         <button
-          onClick={() => setSelectedIndex(-1)}
+          onClick={() => handleOptionClick(-1)}
           className={`w-full rounded-lg border p-4 text-left transition-all ${
             selectedIndex === -1
               ? "border-zinc-400/50 bg-zinc-700/20"
@@ -132,7 +142,7 @@ export function SocratesOptions({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              onClick={() => setSelectedIndex(i)}
+              onClick={() => handleOptionClick(i)}
               className={`w-full rounded-lg border p-4 text-left transition-all ${
                 isSelected
                   ? `${style.borderColor} ${style.selectedBg}`
@@ -159,16 +169,38 @@ export function SocratesOptions({
         })}
       </div>
 
+      {/* Edit area */}
+      {selectedIndex !== null && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          transition={{ duration: 0.2 }}
+          className="space-y-2 overflow-hidden"
+        >
+          <p className="text-xs text-zinc-500">
+            선택한 질문을 자유롭게 수정할 수 있습니다
+          </p>
+          <textarea
+            value={editedQuestion}
+            onChange={(e) => setEditedQuestion(e.target.value)}
+            rows={3}
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-200 outline-none focus:border-indigo-500/50 resize-none"
+            placeholder="토론에 사용할 질문을 입력하세요..."
+          />
+        </motion.div>
+      )}
+
       {/* Confirm button */}
       <div className="flex justify-end">
         <Button
-          disabled={selectedIndex === null}
+          disabled={selectedIndex === null || !editedQuestion.trim()}
           onClick={() => {
             if (selectedIndex === null) return
             if (selectedIndex === -1) {
-              onSelect(null) // use original question
+              onSelect(null, editedQuestion)
             } else {
-              onSelect(analysis.options[selectedIndex])
+              const option = analysis.options[selectedIndex]
+              onSelect({ ...option, refinedQuestion: editedQuestion }, editedQuestion)
             }
           }}
           className="bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-40"

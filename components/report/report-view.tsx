@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import type { Report } from "@/lib/types"
+import type { Report, ReportConclusion } from "@/lib/types"
 import { ConsensusSection } from "./consensus-section"
 import { ThinkingQuestions } from "./thinking-questions"
 import { Button } from "@/components/ui/button"
@@ -155,13 +155,70 @@ export function ReportView({
       )}
 
       {/* Conclusion */}
-      <section className="space-y-3">
+      <section className="space-y-4">
         <h3 className="text-lg font-bold text-zinc-100">결론</h3>
-        <div className="rounded-lg bg-[#1a1a1a] p-5">
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
-            {report.conclusion}
-          </p>
-        </div>
+
+        {typeof report.conclusion === "string" ? (
+          /* 하위 호환: 기존 string conclusion */
+          <div className="rounded-lg bg-[#1a1a1a] p-5">
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+              {report.conclusion}
+            </p>
+          </div>
+        ) : (
+          /* 구조화된 결론 */
+          <div className="space-y-4">
+            {/* Position cards */}
+            <div className="space-y-3">
+              {report.conclusion.positions.map((pos, i) => (
+                <div
+                  key={i}
+                  className="rounded-lg border border-zinc-700/50 bg-[#1a1a1a] p-4 space-y-2"
+                >
+                  <h4 className="text-sm font-semibold text-zinc-200">{pos.position}</h4>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    <div className="rounded-md bg-emerald-500/5 p-2.5">
+                      <p className="text-xs font-medium text-emerald-400">강점</p>
+                      <p className="mt-1 text-xs text-zinc-300">{pos.strengths}</p>
+                    </div>
+                    <div className="rounded-md bg-rose-500/5 p-2.5">
+                      <p className="text-xs font-medium text-rose-400">약점</p>
+                      <p className="mt-1 text-xs text-zinc-300">{pos.weaknesses}</p>
+                    </div>
+                    <div className="rounded-md bg-amber-500/5 p-2.5">
+                      <p className="text-xs font-medium text-amber-400">불확실성</p>
+                      <p className="mt-1 text-xs text-zinc-300">{pos.uncertainty}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Unexplored directions */}
+            {report.conclusion.unexploredDirections.length > 0 && (
+              <div className="rounded-lg border border-zinc-700/30 bg-zinc-800/20 p-4">
+                <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-2">
+                  더 탐색해볼 방향
+                </p>
+                <ul className="space-y-1.5">
+                  {report.conclusion.unexploredDirections.map((dir, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-zinc-400">
+                      <span className="mt-0.5 text-indigo-400">&rarr;</span>
+                      {dir}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Reflection note */}
+            <div className="rounded-lg bg-indigo-500/5 border border-indigo-500/20 p-4">
+              <p className="text-sm leading-relaxed text-indigo-200/90">
+                {report.conclusion.reflectionNote}
+              </p>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Actions */}
