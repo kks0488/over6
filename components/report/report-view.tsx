@@ -1,10 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import type { Report, SixthRebuttal } from "@/lib/types"
+import type { Report } from "@/lib/types"
 import { ConsensusSection } from "./consensus-section"
 import { ThinkingQuestions } from "./thinking-questions"
-import { SixthAICard } from "@/components/debate/sixth-ai-card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, RotateCcw, Share2, Check, Globe } from "lucide-react"
@@ -13,7 +12,6 @@ import Link from "next/link"
 
 interface ReportViewProps {
   report: Report
-  sixthRebuttal: SixthRebuttal
   debateId?: string
   onNewDebate?: () => void
   onShare?: () => Promise<void>
@@ -21,7 +19,6 @@ interface ReportViewProps {
 
 export function ReportView({
   report,
-  sixthRebuttal,
   debateId,
   onNewDebate,
   onShare,
@@ -86,14 +83,6 @@ export function ReportView({
           consensus={report.consensus}
           dissent={report.dissent}
         />
-      </section>
-
-      <Separator className="bg-zinc-800" />
-
-      {/* 6th AI */}
-      <section className="space-y-4">
-        <h3 className="text-lg font-bold text-zinc-100">제6의 AI 반박</h3>
-        <SixthAICard rebuttal={sixthRebuttal} />
       </section>
 
       <Separator className="bg-zinc-800" />

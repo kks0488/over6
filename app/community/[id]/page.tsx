@@ -119,7 +119,6 @@ export default function CommunityDebateDetail() {
           <div className="mt-8 border-t border-zinc-800 pt-8">
             <ReportView
               report={debate.report}
-              sixthRebuttal={debate.sixth}
               debateId={debate.id}
             />
           </div>

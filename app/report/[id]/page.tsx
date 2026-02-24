@@ -69,7 +69,6 @@ export default function ReportPage() {
 
       <ReportView
         report={debate.report}
-        sixthRebuttal={debate.sixthRebuttal}
       />
     </main>
   )

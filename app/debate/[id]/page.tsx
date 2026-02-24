@@ -173,7 +173,6 @@ function DebateStreamContent() {
           <div className="mt-8 border-t border-zinc-800 pt-8">
             <ReportView
               report={report}
-              sixthRebuttal={sixthRebuttal}
               debateId={debateId}
               onNewDebate={() => router.push("/debate")}
               onShare={async () => {
