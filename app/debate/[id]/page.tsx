@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams, useSearchParams } from "next/navigation"
-import { useEffect, useRef, Suspense } from "react"
+import { useEffect, useRef, useCallback, Suspense } from "react"
 import { useDebateStream } from "@/hooks/use-debate-stream"
 import { useDebateHistory } from "@/hooks/use-debate-history"
 import { ProgressBar } from "@/components/debate/progress-bar"
@@ -23,6 +23,7 @@ function DebateStreamContent() {
   const debateId = params.id as string
   const question = searchParams.get("question") ?? ""
   const socratesEnabled = searchParams.get("socrates") !== "false"
+  const socratesMetaParam = searchParams.get("socratesMeta") ?? undefined
 
   const {
     currentStep,
@@ -35,7 +36,7 @@ function DebateStreamContent() {
     report,
     error,
     isStreaming,
-  } = useDebateStream({ debateId, question, socratesEnabled })
+  } = useDebateStream({ debateId, question, socratesEnabled, socratesMetaParam })
 
   // Save to history when complete
   useEffect(() => {
@@ -173,7 +174,33 @@ function DebateStreamContent() {
             <ReportView
               report={report}
               sixthRebuttal={sixthRebuttal}
+              debateId={debateId}
               onNewDebate={() => router.push("/debate")}
+              onShare={async () => {
+                // Generate AI title
+                const titleRes = await fetch(`/api/debates/${debateId}/title`, {
+                  method: "POST",
+                })
+                const { title } = await titleRes.json()
+
+                // Save debate to DB and mark as public
+                await fetch("/api/debates", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    id: debateId,
+                    question,
+                    effectiveQuestion: socratesMeta?.refinedQuestion ?? null,
+                    socratesMeta,
+                    philosophers,
+                    messages,
+                    sixth: sixthRebuttal,
+                    report,
+                    isPublic: true,
+                    title,
+                  }),
+                })
+              }}
             />
           </div>
         )}

@@ -75,7 +75,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.5 }}
-          className="mt-10"
+          className="mt-10 flex flex-wrap items-center justify-center gap-3"
         >
           <Button
             asChild
@@ -85,6 +85,15 @@ export function Hero() {
             <Link href="/debate">
               토론 시작하기
               <ArrowRight className="ml-1 size-4" />
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+          >
+            <Link href="/community">
+              커뮤니티 둘러보기
             </Link>
           </Button>
         </motion.div>

@@ -19,9 +19,15 @@ interface BiasResult {
   }[]
 }
 
-interface ReframeResult {
+interface ReframeOption {
   refinedQuestion: string
+  style: "decisive" | "exploratory" | "experiential"
+  styleLabel: string
   explanation: string
+}
+
+interface ReframeResult {
+  options: ReframeOption[]
 }
 
 async function analyzeFraming(question: string): Promise<FramingResult> {
@@ -94,18 +100,40 @@ async function reframe(
 ): Promise<ReframeResult> {
   const systemPrompt = `너는 소크라테스적 질문 재구성 전문가다.
 원래 질문의 프레이밍, 숨겨진 전제, 인지 편향을 모두 고려하여
-더 열린, 편향이 줄어든 질문 하나를 제안하라.
+서로 다른 스타일의 재구성 질문 3가지를 제안하라.
 
-재구성된 질문은:
-- 이분법적 프레이밍을 해체할 것
+3가지 스타일:
+1. 결단형(decisive): 핵심 딜레마를 선명하게 부각하여 입장 결정을 요구하는 질문
+2. 탐구형(exploratory): 전제와 프레이밍을 해체하여 더 넓은 탐색을 유도하는 질문
+3. 경험형(experiential): 구체적 상황이나 사례를 통해 접근하는 질문
+
+각 재구성 질문은:
+- 원래 질문의 핵심 관심사를 유지할 것
 - 숨겨진 전제를 드러낼 것
-- 더 다양한 관점에서 사고할 수 있게 할 것
-- 원래 질문의 핵심 관심사는 유지할 것
+- 자연스러운 한국어 질문일 것
 
 JSON 형식:
 {
-  "refinedQuestion": "재구성된 질문",
-  "explanation": "왜 이렇게 재구성했는지 설명 (2~3문장)"
+  "options": [
+    {
+      "refinedQuestion": "재구성된 질문",
+      "style": "decisive",
+      "styleLabel": "결단형",
+      "explanation": "왜 이렇게 재구성했는지 설명 (1~2문장)"
+    },
+    {
+      "refinedQuestion": "재구성된 질문",
+      "style": "exploratory",
+      "styleLabel": "탐구형",
+      "explanation": "왜 이렇게 재구성했는지 설명 (1~2문장)"
+    },
+    {
+      "refinedQuestion": "재구성된 질문",
+      "style": "experiential",
+      "styleLabel": "경험형",
+      "explanation": "왜 이렇게 재구성했는지 설명 (1~2문장)"
+    }
+  ]
 }`
 
   const userMessage = `원래 질문: "${question}"
@@ -116,7 +144,14 @@ JSON 형식:
   return chatCompletionJSON<ReframeResult>(systemPrompt, userMessage)
 }
 
-export async function runSocrates(question: string): Promise<SocratesMeta> {
+export interface SocratesAnalysis {
+  framing: FramingResult
+  assumptions: string[]
+  biases: BiasResult["biases"]
+  options: ReframeOption[]
+}
+
+export async function runSocratesAnalysis(question: string): Promise<SocratesAnalysis> {
   // Step 1+2: Parallel — analyze framing and extract assumptions
   const [framing, assumptions] = await Promise.all([
     analyzeFraming(question),
@@ -126,14 +161,34 @@ export async function runSocrates(question: string): Promise<SocratesMeta> {
   // Step 3: Classify biases (depends on framing + assumptions)
   const biases = await classifyBias(question, framing, assumptions)
 
-  // Step 4: Reframe (depends on all previous)
+  // Step 4: Generate 3 reframe options (depends on all previous)
   const reframeResult = await reframe(question, framing, assumptions, biases)
 
   return {
     framing,
     assumptions,
     biases,
-    refinedQuestion: reframeResult.refinedQuestion,
-    explanation: reframeResult.explanation,
+    options: reframeResult.options,
   }
+}
+
+/** Build SocratesMeta from analysis + user's chosen option */
+export function buildSocratesMeta(
+  analysis: SocratesAnalysis,
+  chosenOption: ReframeOption
+): SocratesMeta {
+  return {
+    framing: analysis.framing,
+    assumptions: analysis.assumptions,
+    biases: analysis.biases,
+    refinedQuestion: chosenOption.refinedQuestion,
+    explanation: chosenOption.explanation,
+  }
+}
+
+/** Legacy: run full Socrates pipeline (for backward compat, picks exploratory option) */
+export async function runSocrates(question: string): Promise<SocratesMeta> {
+  const analysis = await runSocratesAnalysis(question)
+  const exploratory = analysis.options.find(o => o.style === "exploratory") || analysis.options[0]
+  return buildSocratesMeta(analysis, exploratory)
 }

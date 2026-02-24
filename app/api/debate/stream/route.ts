@@ -1,10 +1,10 @@
-import { runSocrates } from "@/lib/ai/socrates"
+import { runSocrates, buildSocratesMeta } from "@/lib/ai/socrates"
 import { assignPhilosophers } from "@/lib/ai/assigner"
 import { runDebate } from "@/lib/ai/debate"
 import { runSixthAI } from "@/lib/ai/sixth-ai"
 import { generateReport } from "@/lib/ai/reporter"
 import { MAX_QUESTION_LENGTH } from "@/lib/constants"
-import type { SSEEventType, DebateMessage, Philosopher, ClientPhilosopher } from "@/lib/types"
+import type { SSEEventType, DebateMessage, Philosopher, ClientPhilosopher, SocratesMeta } from "@/lib/types"
 
 export const maxDuration = 300
 
@@ -36,6 +36,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const question = searchParams.get("question")
   const socratesEnabled = searchParams.get("socrates") !== "false"
+  // Pre-analyzed Socrates meta (from 2-step flow)
+  const socratesMetaParam = searchParams.get("socratesMeta")
 
   if (!question || question.trim().length === 0) {
     return new Response(
@@ -57,9 +59,14 @@ export async function GET(request: Request) {
     async start(controller) {
       try {
         // === Phase 1: Socrates ===
-        let socratesMeta = null
+        let socratesMeta: SocratesMeta | null = null
 
-        if (socratesEnabled) {
+        if (socratesMetaParam) {
+          // 2-step flow: user already chose from Socrates options
+          socratesMeta = JSON.parse(decodeURIComponent(socratesMetaParam)) as SocratesMeta
+          sendSSE(controller, encoder, "socrates", socratesMeta)
+          sendProgress(controller, encoder, 15, "소크라테스 분석 완료")
+        } else if (socratesEnabled) {
           sendProgress(controller, encoder, 5, "소크라테스 분석 중...")
           sendSSE(controller, encoder, "socrates_waiting", {
             message: "질문의 프레이밍과 숨겨진 전제를 분석하고 있습니다...",

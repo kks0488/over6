@@ -1,26 +1,45 @@
 "use client"
 
+import { useState } from "react"
 import type { Report, SixthRebuttal } from "@/lib/types"
 import { ConsensusSection } from "./consensus-section"
 import { ThinkingQuestions } from "./thinking-questions"
 import { SixthAICard } from "@/components/debate/sixth-ai-card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, RotateCcw } from "lucide-react"
+import { ArrowLeft, RotateCcw, Share2, Check, Globe } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 
 interface ReportViewProps {
   report: Report
   sixthRebuttal: SixthRebuttal
+  debateId?: string
   onNewDebate?: () => void
+  onShare?: () => Promise<void>
 }
 
 export function ReportView({
   report,
   sixthRebuttal,
+  debateId,
   onNewDebate,
+  onShare,
 }: ReportViewProps) {
+  const [shareStatus, setShareStatus] = useState<"idle" | "sharing" | "shared">("idle")
+
+  async function handleShare() {
+    if (onShare) {
+      setShareStatus("sharing")
+      try {
+        await onShare()
+        setShareStatus("shared")
+      } catch {
+        setShareStatus("idle")
+      }
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -95,11 +114,47 @@ export function ReportView({
         </>
       )}
 
+      {/* Missing Perspectives */}
+      {report.missingPerspectives && report.missingPerspectives.length > 0 && (
+        <>
+          <section className="space-y-4">
+            <h3 className="text-lg font-bold text-zinc-100">빠진 관점</h3>
+            <ul className="space-y-2">
+              {report.missingPerspectives.map((perspective, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-2 rounded-md bg-violet-500/5 p-3 text-sm text-zinc-300"
+                >
+                  <span className="mt-0.5 text-violet-400">&#8226;</span>
+                  {perspective}
+                </li>
+              ))}
+            </ul>
+          </section>
+          <Separator className="bg-zinc-800" />
+        </>
+      )}
+
       {/* Thinking Questions */}
       {report.thinkingQuestions.length > 0 && (
         <>
           <section>
             <ThinkingQuestions questions={report.thinkingQuestions} />
+          </section>
+          <Separator className="bg-zinc-800" />
+        </>
+      )}
+
+      {/* Uncertainty Note */}
+      {report.uncertaintyNote && (
+        <>
+          <section className="space-y-3">
+            <h3 className="text-lg font-bold text-zinc-100">보고서의 한계</h3>
+            <div className="rounded-lg border border-zinc-700/50 bg-zinc-800/30 p-4">
+              <p className="text-xs leading-relaxed text-zinc-400">
+                {report.uncertaintyNote}
+              </p>
+            </div>
           </section>
           <Separator className="bg-zinc-800" />
         </>
@@ -116,32 +171,59 @@ export function ReportView({
       </section>
 
       {/* Actions */}
-      <div className="flex items-center justify-between pt-4 pb-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-4 pb-8">
         <Button variant="outline" asChild>
           <Link href="/debate/history">
             <ArrowLeft className="size-4" />
             전체 토론 보기
           </Link>
         </Button>
-        {onNewDebate ? (
-          <Button
-            onClick={onNewDebate}
-            className="bg-indigo-600 text-white hover:bg-indigo-500"
-          >
-            <RotateCcw className="size-4" />
-            새 토론 시작
-          </Button>
-        ) : (
-          <Button
-            asChild
-            className="bg-indigo-600 text-white hover:bg-indigo-500"
-          >
-            <Link href="/debate">
+        <div className="flex gap-2">
+          {onShare && (
+            <Button
+              variant="outline"
+              onClick={handleShare}
+              disabled={shareStatus !== "idle"}
+              className={shareStatus === "shared" ? "border-emerald-500/30 text-emerald-400" : ""}
+            >
+              {shareStatus === "shared" ? (
+                <>
+                  <Check className="size-4" />
+                  커뮤니티에 공유됨
+                </>
+              ) : shareStatus === "sharing" ? (
+                <>
+                  <Globe className="size-4 animate-pulse" />
+                  공유 중...
+                </>
+              ) : (
+                <>
+                  <Share2 className="size-4" />
+                  커뮤니티에 공유
+                </>
+              )}
+            </Button>
+          )}
+          {onNewDebate ? (
+            <Button
+              onClick={onNewDebate}
+              className="bg-indigo-600 text-white hover:bg-indigo-500"
+            >
               <RotateCcw className="size-4" />
               새 토론 시작
-            </Link>
-          </Button>
-        )}
+            </Button>
+          ) : (
+            <Button
+              asChild
+              className="bg-indigo-600 text-white hover:bg-indigo-500"
+            >
+              <Link href="/debate">
+                <RotateCcw className="size-4" />
+                새 토론 시작
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
     </motion.div>
   )

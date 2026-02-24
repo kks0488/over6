@@ -4,7 +4,7 @@ export type PhilosophyTradition =
   | "buddhism" | "legalism" | "critical_theory" | "care_ethics"
 
 export type DebateStep =
-  | "idle" | "socrates" | "assign"
+  | "idle" | "socrates" | "socrates_review" | "assign"
   | "round1" | "round2" | "round3"
   | "sixth" | "report" | "complete"
 
@@ -22,6 +22,20 @@ export interface SocratesMeta {
   }[]
   refinedQuestion: string
   explanation: string
+}
+
+export interface SocratesOption {
+  refinedQuestion: string
+  style: "decisive" | "exploratory" | "experiential"
+  styleLabel: string
+  explanation: string
+}
+
+export interface SocratesAnalysisResult {
+  framing: SocratesMeta["framing"]
+  assumptions: string[]
+  biases: SocratesMeta["biases"]
+  options: SocratesOption[]
 }
 
 export interface Philosopher {
@@ -66,6 +80,8 @@ export interface Report {
   sixthRebuttal: SixthRebuttal
   biasesFound: string[]
   thinkingQuestions: string[]
+  missingPerspectives: string[]
+  uncertaintyNote: string
   conclusion: string
 }
 
@@ -84,7 +100,7 @@ export interface DebateRecord {
 }
 
 export type SSEEventType =
-  | "socrates" | "socrates_waiting" | "philosophers"
+  | "socrates" | "socrates_waiting" | "socrates_options" | "philosophers"
   | "message" | "sixth" | "report" | "progress" | "error" | "done"
 
 export interface SSEEvent {

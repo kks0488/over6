@@ -86,9 +86,9 @@ export const TRADITIONS: Record<PhilosophyTradition, TraditionDefinition> = {
     name: "프래그마티즘",
     nameEn: "Pragmatism",
     category: "western",
-    coreView: "진리는 실제 경험에서의 유용성으로 검증된다. 이론보다 실천적 결과가 중요하다.",
-    representative: "듀이 / 제임스",
-    keywords: ["실용", "경험", "결과", "유용성", "실천", "적응"],
+    coreView: "진리는 실제 경험에서의 유용성으로 검증되며, 모든 신념은 오류 가능하다(퍼스). 이론보다 실천적 결과가 중요하고, 탐구는 끝나지 않는다.",
+    representative: "듀이 / 퍼스",
+    keywords: ["실용", "경험", "오류가능주의", "탐구", "실천", "가설"],
     axes: {
       resultVsPrinciple: 0.7,
       individualVsCollective: 0.1,
@@ -120,7 +120,7 @@ export const TRADITIONS: Record<PhilosophyTradition, TraditionDefinition> = {
     category: "eastern",
     coreView: "인의예지를 근본으로 삼아 인간관계의 도리를 실천하고, 수신제가치국평천하의 질서를 추구한다.",
     representative: "공자 / 맹자",
-    keywords: ["인", "의", "예", "효", "관계", "수양"],
+    keywords: ["인", "의", "예", "수양", "성선설", "오륜"],
     axes: {
       resultVsPrinciple: -0.5,
       individualVsCollective: -0.8,
@@ -134,7 +134,7 @@ export const TRADITIONS: Record<PhilosophyTradition, TraditionDefinition> = {
     name: "도가",
     nameEn: "Daoism",
     category: "eastern",
-    coreView: "도(道)는 말로 규정할 수 없으며, 무위자연의 순리를 따르는 것이 최상의 삶이다. 인위적 구분과 집착을 내려놓아라.",
+    coreView: "도(道)는 말로 규정할 수 없으며, 무위자연의 순리를 따르는 것이 최상의 삶이다. 인위적 분별에 집착하지 말되, 자연의 흐름 속에서 적절히 응하라.",
     representative: "장자 / 노자",
     keywords: ["도", "무위", "자연", "순리", "무", "소요유"],
     axes: {
@@ -150,9 +150,9 @@ export const TRADITIONS: Record<PhilosophyTradition, TraditionDefinition> = {
     name: "불교",
     nameEn: "Buddhism",
     category: "eastern",
-    coreView: "모든 현상은 공(空)이며 연기(緣起)에 의해 상호 의존적으로 존재한다. 집착을 내려놓는 것이 고통에서 벗어나는 길이다.",
+    coreView: "모든 현상은 공(空)이며 연기(緣起)에 의해 상호 의존적으로 존재한다. 집착을 내려놓되, 자비(慈悲)와 팔정도의 실천으로 고통에서 벗어나는 길을 닦는다.",
     representative: "나가르주나",
-    keywords: ["공", "연기", "무아", "중도", "고", "해탈"],
+    keywords: ["공", "연기", "무아", "중도", "자비", "팔정도"],
     axes: {
       resultVsPrinciple: -0.1,
       individualVsCollective: -0.3,
@@ -166,7 +166,7 @@ export const TRADITIONS: Record<PhilosophyTradition, TraditionDefinition> = {
     name: "법가",
     nameEn: "Legalism",
     category: "eastern",
-    coreView: "인간 본성은 이기적이므로 명확한 법과 상벌 체계로 통치해야 한다. 시스템과 인센티브가 도덕보다 효과적이다.",
+    coreView: "인간은 이익을 추구하는 존재이므로 명확한 법과 상벌 체계로 통치해야 한다. 제도적 인센티브가 도덕적 호소보다 안정적으로 작동한다.",
     representative: "한비자",
     keywords: ["법", "술", "세", "상벌", "통치", "시스템"],
     axes: {
@@ -198,9 +198,9 @@ export const TRADITIONS: Record<PhilosophyTradition, TraditionDefinition> = {
     name: "돌봄 윤리",
     nameEn: "Ethics of Care",
     category: "modern",
-    coreView: "도덕성의 근본은 추상적 원칙이 아니라 구체적 관계 속의 돌봄과 응답이다. 타자의 취약성에 대한 책임이 윤리의 출발점이다.",
+    coreView: "도덕성의 근본은 추상적 원칙이 아니라 구체적 관계 속의 돌봄과 응답이다. 보이지 않는 돌봄 노동을 가시화하고, 타자의 취약성에 대한 책임이 윤리의 출발점이다.",
     representative: "길리건 / 나딩스",
-    keywords: ["돌봄", "관계", "응답", "취약성", "공감", "책임"],
+    keywords: ["돌봄", "관계", "응답", "취약성", "돌봄노동", "책임"],
     axes: {
       resultVsPrinciple: 0.3,
       individualVsCollective: -0.5,

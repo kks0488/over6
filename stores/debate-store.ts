@@ -2,6 +2,7 @@ import { create } from "zustand"
 import type {
   DebateStep,
   SocratesMeta,
+  SocratesAnalysisResult,
   ClientPhilosopher,
   DebateMessage,
   SixthRebuttal,
@@ -15,6 +16,7 @@ interface DebateState {
   currentStep: DebateStep
   progress: number
   progressLabel: string
+  socratesAnalysis: SocratesAnalysisResult | null
   socratesMeta: SocratesMeta | null
   refinedQuestion: string | null
   philosophers: ClientPhilosopher[]
@@ -29,6 +31,7 @@ interface DebateActions {
   startDebate: (debateId: string, question: string, socratesEnabled: boolean) => void
   setStep: (step: DebateStep) => void
   setProgress: (progress: number, label?: string) => void
+  setSocratesAnalysis: (analysis: SocratesAnalysisResult) => void
   setSocratesMeta: (meta: SocratesMeta) => void
   setRefinedQuestion: (question: string) => void
   setPhilosophers: (philosophers: ClientPhilosopher[]) => void
@@ -47,6 +50,7 @@ const initialState: DebateState = {
   currentStep: "idle",
   progress: 0,
   progressLabel: "",
+  socratesAnalysis: null,
   socratesMeta: null,
   refinedQuestion: null,
   philosophers: [],
@@ -77,6 +81,14 @@ export const useDebateStore = create<DebateState & DebateActions>()((set) => ({
       progress,
       progressLabel: label ?? state.progressLabel,
     })),
+
+  setSocratesAnalysis: (analysis) =>
+    set({
+      socratesAnalysis: analysis,
+      currentStep: "socrates",
+      progress: 12,
+      progressLabel: "소크라테스 분석 완료 — 질문을 선택하세요",
+    }),
 
   setSocratesMeta: (meta) =>
     set({

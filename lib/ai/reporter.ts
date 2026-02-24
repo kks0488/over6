@@ -9,6 +9,8 @@ import type {
 interface ReportInsights {
   biasesFound: string[]
   thinkingQuestions: string[]
+  missingPerspectives: string[]
+  uncertaintyNote: string
 }
 
 async function generateInsights(
@@ -35,10 +37,20 @@ async function generateInsights(
    - 실생활에 적용할 수 있는 구체적 질문
    - "이것이 정답이다"가 아닌 "이런 것도 생각해보라"의 톤
 
+3. missingPerspectives: 이 토론에서 빠진 중요한 관점이나 전통 2~3개
+   - 참여하지 않은 철학 전통 중 이 주제에 의미 있는 기여를 할 수 있었던 것
+   - 각 항목은 왜 이 관점이 필요했는지 한 문장으로
+
+4. uncertaintyNote: 이 보고서의 한계와 불확실성을 한 문단으로 솔직히 기술
+   - AI 토론의 구조적 한계 (실제 인간 경험 부재, 맥락 축소 등)
+   - 이 보고서가 확정적 결론이 아닌 사고의 출발점임을 명시
+
 JSON 형식:
 {
   "biasesFound": ["편향1", "편향2"],
-  "thinkingQuestions": ["질문1", "질문2"]
+  "thinkingQuestions": ["질문1", "질문2"],
+  "missingPerspectives": ["빠진 관점1", "빠진 관점2"],
+  "uncertaintyNote": "이 보고서의 한계..."
 }`
 
   const socratesSection = socratesMeta
@@ -100,6 +112,8 @@ export async function generateReport(
     sixthRebuttal,
     biasesFound: insights.biasesFound,
     thinkingQuestions: insights.thinkingQuestions,
+    missingPerspectives: insights.missingPerspectives,
+    uncertaintyNote: insights.uncertaintyNote,
     conclusion: "최종 판단은 당신의 몫입니다.",
   }
 }

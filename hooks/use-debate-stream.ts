@@ -14,12 +14,14 @@ interface UseDebateStreamOptions {
   debateId: string
   question: string
   socratesEnabled: boolean
+  socratesMetaParam?: string
 }
 
 export function useDebateStream({
   debateId,
   question,
   socratesEnabled,
+  socratesMetaParam,
 }: UseDebateStreamOptions) {
   const eventSourceRef = useRef<EventSource | null>(null)
   const hasStartedRef = useRef(false)
@@ -64,6 +66,9 @@ export function useDebateStream({
       question,
       socrates: String(socratesEnabled),
     })
+    if (socratesMetaParam) {
+      params.set("socratesMeta", socratesMetaParam)
+    }
 
     const es = new EventSource(`/api/debate/stream?${params.toString()}`)
     eventSourceRef.current = es
@@ -133,6 +138,7 @@ export function useDebateStream({
     debateId,
     question,
     socratesEnabled,
+    socratesMetaParam,
     startDebate,
     setProgress,
     setSocratesMeta,
