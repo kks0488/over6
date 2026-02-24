@@ -28,6 +28,7 @@ export async function initDB() {
       sixth JSONB,
       report JSONB,
       is_public BOOLEAN NOT NULL DEFAULT FALSE,
+      delete_token TEXT,
       title TEXT,
       created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
     )
@@ -35,6 +36,10 @@ export async function initDB() {
   await db`
     CREATE INDEX IF NOT EXISTS idx_debates_public ON debates (is_public, created_at DESC)
     WHERE is_public = TRUE
+  `
+  // Add delete_token column if missing (for existing tables)
+  await db`
+    ALTER TABLE debates ADD COLUMN IF NOT EXISTS delete_token TEXT
   `
   return { skipped: false }
 }
@@ -49,6 +54,7 @@ export interface DBDebate {
   sixth: unknown | null
   report: unknown | null
   is_public: boolean
+  delete_token: string | null
   title: string | null
   created_at: Date
 }
@@ -64,12 +70,13 @@ export async function saveDebate(debate: {
   report?: unknown | null
   isPublic?: boolean
   title?: string | null
+  deleteToken?: string | null
 }): Promise<boolean> {
   const db = await getSQL()
   if (!db) return false
 
   await db`
-    INSERT INTO debates (id, question, effective_question, socrates_meta, philosophers, messages, sixth, report, is_public, title)
+    INSERT INTO debates (id, question, effective_question, socrates_meta, philosophers, messages, sixth, report, is_public, delete_token, title)
     VALUES (
       ${debate.id},
       ${debate.question},
@@ -80,12 +87,14 @@ export async function saveDebate(debate: {
       ${debate.sixth ? JSON.stringify(debate.sixth) : null}::jsonb,
       ${debate.report ? JSON.stringify(debate.report) : null}::jsonb,
       ${debate.isPublic ?? false},
+      ${debate.deleteToken ?? null},
       ${debate.title ?? null}
     )
     ON CONFLICT (id) DO UPDATE SET
       report = EXCLUDED.report,
       sixth = EXCLUDED.sixth,
       is_public = EXCLUDED.is_public,
+      delete_token = COALESCE(EXCLUDED.delete_token, debates.delete_token),
       title = EXCLUDED.title
   `
   return true
@@ -113,6 +122,18 @@ export async function getPublicDebates(
     LIMIT ${limit} OFFSET ${offset}
   `
   return rows as DBDebate[]
+}
+
+export async function deleteDebate(id: string, token: string): Promise<"deleted" | "not_found" | "forbidden"> {
+  const db = await getSQL()
+  if (!db) return "not_found"
+
+  const { rows } = await db`SELECT delete_token FROM debates WHERE id = ${id}`
+  if (rows.length === 0) return "not_found"
+  if (rows[0].delete_token !== token) return "forbidden"
+
+  await db`DELETE FROM debates WHERE id = ${id}`
+  return "deleted"
 }
 
 export async function setDebatePublic(id: string, isPublic: boolean, title?: string): Promise<boolean> {

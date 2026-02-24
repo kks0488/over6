@@ -1,4 +1,5 @@
 import { saveDebate, getPublicDebates, isDBConfigured } from "@/lib/db"
+import { nanoid } from "nanoid"
 
 export async function POST(request: Request) {
   if (!isDBConfigured()) {
@@ -18,6 +19,8 @@ export async function POST(request: Request) {
       )
     }
 
+    const deleteToken = nanoid(32)
+
     await saveDebate({
       id: body.id,
       question: body.question,
@@ -29,9 +32,10 @@ export async function POST(request: Request) {
       report: body.report ?? null,
       isPublic: body.isPublic ?? false,
       title: body.title ?? null,
+      deleteToken,
     })
 
-    return Response.json({ ok: true, id: body.id })
+    return Response.json({ ok: true, id: body.id, deleteToken })
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error"
     return Response.json({ ok: false, error: message }, { status: 500 })

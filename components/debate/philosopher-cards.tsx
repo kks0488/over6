@@ -58,9 +58,11 @@ function PhilosopherCard({ philosopher, index }: { philosopher: ClientPhilosophe
               </Badge>
             )}
           </div>
-          <p className={`text-xs text-zinc-400 ${expanded ? "" : "line-clamp-2"}`}>
-            {philosopher.stance}
-          </p>
+          {!expanded && (
+            <p className="text-xs text-zinc-400 line-clamp-2">
+              {philosopher.stance}
+            </p>
+          )}
         </div>
         <ChevronDown
           className={`mt-1 size-4 shrink-0 text-zinc-600 transition-transform duration-200 ${

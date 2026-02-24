@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS debates (
   sixth JSONB,
   report JSONB,
   is_public BOOLEAN NOT NULL DEFAULT FALSE,
+  delete_token TEXT,
   title TEXT,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );

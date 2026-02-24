@@ -1,4 +1,4 @@
-import { getDebate, setDebatePublic, isDBConfigured } from "@/lib/db"
+import { getDebate, setDebatePublic, deleteDebate, isDBConfigured } from "@/lib/db"
 
 export async function GET(
   _request: Request,
@@ -42,6 +42,39 @@ export async function PATCH(
 
     if (body.isPublic !== undefined) {
       await setDebatePublic(id, body.isPublic, body.title)
+    }
+
+    return Response.json({ ok: true })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error"
+    return Response.json({ error: message }, { status: 500 })
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!isDBConfigured()) {
+    return Response.json({ error: "데이터베이스가 아직 연결되지 않았습니다." }, { status: 503 })
+  }
+
+  try {
+    const { id } = await params
+    const body = await request.json()
+    const token = body.deleteToken as string
+
+    if (!token) {
+      return Response.json({ error: "삭제 토큰이 필요합니다." }, { status: 400 })
+    }
+
+    const result = await deleteDebate(id, token)
+
+    if (result === "not_found") {
+      return Response.json({ error: "토론을 찾을 수 없습니다." }, { status: 404 })
+    }
+    if (result === "forbidden") {
+      return Response.json({ error: "삭제 권한이 없습니다." }, { status: 403 })
     }
 
     return Response.json({ ok: true })

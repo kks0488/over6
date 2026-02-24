@@ -206,6 +206,10 @@ function DebateStreamContent() {
                   const err = await saveRes.json()
                   throw new Error(err.error || "공유에 실패했습니다.")
                 }
+                const saveData = await saveRes.json()
+                if (saveData.deleteToken) {
+                  localStorage.setItem(`over6-del-${debateId}`, saveData.deleteToken)
+                }
               }}
             />
           </div>

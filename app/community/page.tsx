@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { MessageSquare, Clock, ArrowRight } from "lucide-react"
+import { MessageSquare, Clock, ArrowRight, Trash2 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { ko } from "date-fns/locale"
 import Link from "next/link"
@@ -20,6 +20,7 @@ export default function CommunityPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [dbReady, setDbReady] = useState(true)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     async function load() {
@@ -36,6 +37,41 @@ export default function CommunityPage() {
       }
     }
     load()
+  }, [])
+
+  function hasDeleteToken(debateId: string): boolean {
+    if (typeof window === "undefined") return false
+    return !!localStorage.getItem(`over6-del-${debateId}`)
+  }
+
+  const handleDelete = useCallback(async (debateId: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const token = localStorage.getItem(`over6-del-${debateId}`)
+    if (!token) return
+
+    if (!confirm("이 토론을 커뮤니티에서 삭제하시겠습니까?")) return
+
+    setDeletingId(debateId)
+    try {
+      const res = await fetch(`/api/debates/${debateId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ deleteToken: token }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        alert(err.error || "삭제에 실패했습니다.")
+        return
+      }
+      localStorage.removeItem(`over6-del-${debateId}`)
+      setDebates((prev) => prev.filter((d) => d.id !== debateId))
+    } catch {
+      alert("삭제 중 오류가 발생했습니다.")
+    } finally {
+      setDeletingId(null)
+    }
   }, [])
 
   return (
@@ -129,7 +165,19 @@ export default function CommunityPage() {
                       })}
                     </div>
                   </div>
-                  <ArrowRight className="mt-1 size-4 shrink-0 text-zinc-600 transition-colors group-hover:text-indigo-400" />
+                  <div className="flex items-center gap-2">
+                    {hasDeleteToken(debate.id) && (
+                      <button
+                        onClick={(e) => handleDelete(debate.id, e)}
+                        disabled={deletingId === debate.id}
+                        className="rounded-md p-1.5 text-zinc-600 transition-colors hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50"
+                        title="삭제"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    )}
+                    <ArrowRight className="mt-1 size-4 shrink-0 text-zinc-600 transition-colors group-hover:text-indigo-400" />
+                  </div>
                 </div>
               </Link>
             </motion.div>
