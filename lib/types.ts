@@ -48,8 +48,11 @@ export interface Philosopher {
   systemPrompt: string
 }
 
-/** Philosopher shape sent to the client (systemPrompt stripped by server) */
-export type ClientPhilosopher = Omit<Philosopher, "systemPrompt">
+/** Philosopher shape sent to the client (systemPrompt stripped, coreView added) */
+export type ClientPhilosopher = Omit<Philosopher, "systemPrompt"> & {
+  coreView: string
+  category: "western" | "eastern" | "modern"
+}
 
 export interface DebateMessage {
   id: string

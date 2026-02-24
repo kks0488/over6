@@ -1,12 +1,18 @@
 import { assignPhilosophers } from "@/lib/ai/assigner"
 import { MAX_QUESTION_LENGTH } from "@/lib/constants"
+import { TRADITIONS } from "@/lib/philosophers/traditions"
 import type { Philosopher, ClientPhilosopher, SocratesMeta } from "@/lib/types"
 
 export const maxDuration = 60
 
-function stripSystemPrompt(philosopher: Philosopher): ClientPhilosopher {
+function toClientPhilosopher(philosopher: Philosopher): ClientPhilosopher {
   const { systemPrompt: _, ...rest } = philosopher
-  return rest
+  const def = TRADITIONS[philosopher.tradition]
+  return {
+    ...rest,
+    coreView: def.coreView,
+    category: def.category,
+  }
 }
 
 export async function POST(request: Request) {
@@ -31,7 +37,7 @@ export async function POST(request: Request) {
     const philosophers = await assignPhilosophers(effectiveQuestion, socratesMeta)
 
     // Return client-safe philosophers (without systemPrompt)
-    const clientPhilosophers = philosophers.map(stripSystemPrompt)
+    const clientPhilosophers = philosophers.map(toClientPhilosopher)
 
     // Store the full philosopher data in a compact form for later rounds
     // We encode tradition + stance + color so the round endpoint can reconstruct systemPrompts
