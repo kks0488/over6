@@ -180,11 +180,14 @@ function DebateStreamContent() {
                 // Generate AI title
                 const titleRes = await fetch(`/api/debates/${debateId}/title`, {
                   method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ question }),
                 })
-                const { title } = await titleRes.json()
+                const titleData = await titleRes.json()
+                const title = titleData.title || question.slice(0, 30)
 
                 // Save debate to DB and mark as public
-                await fetch("/api/debates", {
+                const saveRes = await fetch("/api/debates", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
@@ -200,6 +203,10 @@ function DebateStreamContent() {
                     title,
                   }),
                 })
+                if (!saveRes.ok) {
+                  const err = await saveRes.json()
+                  throw new Error(err.error || "공유에 실패했습니다.")
+                }
               }}
             />
           </div>

@@ -19,6 +19,7 @@ export default function CommunityPage() {
   const [debates, setDebates] = useState<CommunityDebate[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [dbReady, setDbReady] = useState(true)
 
   useEffect(() => {
     async function load() {
@@ -26,7 +27,8 @@ export default function CommunityPage() {
         const res = await fetch("/api/debates?limit=30")
         if (!res.ok) throw new Error("Failed to load")
         const data = await res.json()
-        setDebates(data.debates)
+        setDebates(data.debates ?? [])
+        if (data.dbReady === false) setDbReady(false)
       } catch {
         setError("토론 목록을 불러올 수 없습니다.")
       } finally {
@@ -79,11 +81,21 @@ export default function CommunityPage() {
           <div className="rounded-lg bg-[#1a1a1a] p-12 text-center">
             <MessageSquare className="mx-auto size-8 text-zinc-600" />
             <p className="mt-4 text-sm text-zinc-500">
-              아직 공유된 토론이 없습니다.
+              {dbReady
+                ? "아직 공유된 토론이 없습니다."
+                : "커뮤니티 기능 준비 중입니다."}
             </p>
             <p className="mt-1 text-xs text-zinc-600">
-              토론을 완료한 후 &ldquo;커뮤니티에 공유&rdquo; 버튼을 눌러보세요.
+              {dbReady
+                ? '토론을 완료한 후 "커뮤니티에 공유" 버튼을 눌러보세요.'
+                : "곧 다른 사람들의 토론을 볼 수 있게 됩니다."}
             </p>
+            <Link
+              href="/debate"
+              className="mt-4 inline-block text-sm text-indigo-400 hover:text-indigo-300"
+            >
+              토론 시작하기 &rarr;
+            </Link>
           </div>
         )}
 

@@ -1,7 +1,23 @@
-import { sql } from "@vercel/postgres"
+let sql: typeof import("@vercel/postgres").sql | null = null
+
+function isDBConfigured(): boolean {
+  return !!(process.env.POSTGRES_URL || process.env.POSTGRES_URL_NON_POOLING)
+}
+
+async function getSQL() {
+  if (!isDBConfigured()) return null
+  if (!sql) {
+    const mod = await import("@vercel/postgres")
+    sql = mod.sql
+  }
+  return sql
+}
 
 export async function initDB() {
-  await sql`
+  const db = await getSQL()
+  if (!db) return { skipped: true, reason: "POSTGRES_URL not configured" }
+
+  await db`
     CREATE TABLE IF NOT EXISTS debates (
       id TEXT PRIMARY KEY,
       question TEXT NOT NULL,
@@ -16,10 +32,11 @@ export async function initDB() {
       created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
     )
   `
-  await sql`
+  await db`
     CREATE INDEX IF NOT EXISTS idx_debates_public ON debates (is_public, created_at DESC)
     WHERE is_public = TRUE
   `
+  return { skipped: false }
 }
 
 export interface DBDebate {
@@ -47,8 +64,11 @@ export async function saveDebate(debate: {
   report?: unknown | null
   isPublic?: boolean
   title?: string | null
-}) {
-  await sql`
+}): Promise<boolean> {
+  const db = await getSQL()
+  if (!db) return false
+
+  await db`
     INSERT INTO debates (id, question, effective_question, socrates_meta, philosophers, messages, sixth, report, is_public, title)
     VALUES (
       ${debate.id},
@@ -68,10 +88,14 @@ export async function saveDebate(debate: {
       is_public = EXCLUDED.is_public,
       title = EXCLUDED.title
   `
+  return true
 }
 
 export async function getDebate(id: string): Promise<DBDebate | null> {
-  const { rows } = await sql`SELECT * FROM debates WHERE id = ${id}`
+  const db = await getSQL()
+  if (!db) return null
+
+  const { rows } = await db`SELECT * FROM debates WHERE id = ${id}`
   return (rows[0] as DBDebate) ?? null
 }
 
@@ -79,7 +103,10 @@ export async function getPublicDebates(
   limit: number = 20,
   offset: number = 0
 ): Promise<DBDebate[]> {
-  const { rows } = await sql`
+  const db = await getSQL()
+  if (!db) return []
+
+  const { rows } = await db`
     SELECT * FROM debates
     WHERE is_public = TRUE
     ORDER BY created_at DESC
@@ -88,14 +115,20 @@ export async function getPublicDebates(
   return rows as DBDebate[]
 }
 
-export async function setDebatePublic(id: string, isPublic: boolean, title?: string) {
+export async function setDebatePublic(id: string, isPublic: boolean, title?: string): Promise<boolean> {
+  const db = await getSQL()
+  if (!db) return false
+
   if (title) {
-    await sql`
+    await db`
       UPDATE debates SET is_public = ${isPublic}, title = ${title} WHERE id = ${id}
     `
   } else {
-    await sql`
+    await db`
       UPDATE debates SET is_public = ${isPublic} WHERE id = ${id}
     `
   }
+  return true
 }
+
+export { isDBConfigured }

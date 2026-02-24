@@ -1,6 +1,13 @@
-import { saveDebate, getPublicDebates } from "@/lib/db"
+import { saveDebate, getPublicDebates, isDBConfigured } from "@/lib/db"
 
 export async function POST(request: Request) {
+  if (!isDBConfigured()) {
+    return Response.json(
+      { ok: false, error: "데이터베이스가 아직 연결되지 않았습니다." },
+      { status: 503 }
+    )
+  }
+
   try {
     const body = await request.json()
 
@@ -32,6 +39,10 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+  if (!isDBConfigured()) {
+    return Response.json({ debates: [], dbReady: false })
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const limit = Math.min(parseInt(searchParams.get("limit") ?? "20"), 50)
@@ -46,6 +57,7 @@ export async function GET(request: Request) {
         title: d.title,
         createdAt: d.created_at,
       })),
+      dbReady: true,
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error"

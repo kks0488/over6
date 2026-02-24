@@ -26,16 +26,21 @@ export function ReportView({
   onNewDebate,
   onShare,
 }: ReportViewProps) {
-  const [shareStatus, setShareStatus] = useState<"idle" | "sharing" | "shared">("idle")
+  const [shareStatus, setShareStatus] = useState<"idle" | "sharing" | "shared" | "error">("idle")
+  const [shareError, setShareError] = useState<string | null>(null)
 
   async function handleShare() {
     if (onShare) {
       setShareStatus("sharing")
+      setShareError(null)
       try {
         await onShare()
         setShareStatus("shared")
-      } catch {
-        setShareStatus("idle")
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "공유에 실패했습니다."
+        setShareError(msg)
+        setShareStatus("error")
+        setTimeout(() => { setShareStatus("idle"); setShareError(null) }, 4000)
       }
     }
   }
@@ -180,29 +185,45 @@ export function ReportView({
         </Button>
         <div className="flex gap-2">
           {onShare && (
-            <Button
-              variant="outline"
-              onClick={handleShare}
-              disabled={shareStatus !== "idle"}
-              className={shareStatus === "shared" ? "border-emerald-500/30 text-emerald-400" : ""}
-            >
-              {shareStatus === "shared" ? (
-                <>
-                  <Check className="size-4" />
-                  커뮤니티에 공유됨
-                </>
-              ) : shareStatus === "sharing" ? (
-                <>
-                  <Globe className="size-4 animate-pulse" />
-                  공유 중...
-                </>
-              ) : (
-                <>
-                  <Share2 className="size-4" />
-                  커뮤니티에 공유
-                </>
+            <div className="flex flex-col items-end gap-1">
+              <Button
+                variant="outline"
+                onClick={handleShare}
+                disabled={shareStatus === "sharing" || shareStatus === "shared"}
+                className={
+                  shareStatus === "shared"
+                    ? "border-emerald-500/30 text-emerald-400"
+                    : shareStatus === "error"
+                      ? "border-red-500/30 text-red-400"
+                      : ""
+                }
+              >
+                {shareStatus === "shared" ? (
+                  <>
+                    <Check className="size-4" />
+                    커뮤니티에 공유됨
+                  </>
+                ) : shareStatus === "sharing" ? (
+                  <>
+                    <Globe className="size-4 animate-pulse" />
+                    공유 중...
+                  </>
+                ) : shareStatus === "error" ? (
+                  <>
+                    <Share2 className="size-4" />
+                    다시 시도
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="size-4" />
+                    커뮤니티에 공유
+                  </>
+                )}
+              </Button>
+              {shareError && (
+                <p className="text-xs text-red-400">{shareError}</p>
               )}
-            </Button>
+            </div>
           )}
           {onNewDebate ? (
             <Button

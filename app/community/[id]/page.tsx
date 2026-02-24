@@ -35,6 +35,7 @@ export default function CommunityDebateDetail() {
         const res = await fetch(`/api/debates/${id}`)
         if (!res.ok) {
           if (res.status === 404) throw new Error("토론을 찾을 수 없습니다.")
+          if (res.status === 503) throw new Error("커뮤니티 기능 준비 중입니다. 곧 이용 가능합니다.")
           throw new Error("불러오기 실패")
         }
         const data = await res.json()
