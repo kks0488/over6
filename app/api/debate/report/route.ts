@@ -1,7 +1,7 @@
 import { generateReport } from "@/lib/ai/reporter"
 import type { DebateMessage, SocratesMeta, SixthRebuttal } from "@/lib/types"
 
-export const maxDuration = 60
+export const maxDuration = 300
 
 export async function POST(request: Request) {
   try {

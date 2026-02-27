@@ -14,6 +14,7 @@ const WEAPON_LABELS = [
   { key: "hypothesisReversal" as const, label: "가설 전복", icon: "2" },
   { key: "biasDeconstruction" as const, label: "편향 해체", icon: "3" },
   { key: "fundamentalQuestion" as const, label: "근본 질문", icon: "4" },
+  { key: "mortalityLens" as const, label: "사멸 렌즈", icon: "5" },
 ]
 
 export function SixthAICard({ rebuttal }: SixthAICardProps) {
@@ -78,7 +79,7 @@ export function SixthAICard({ rebuttal }: SixthAICardProps) {
               </span>
             </div>
             <p className="whitespace-pre-wrap pl-7 text-sm leading-relaxed text-zinc-300">
-              {rebuttal[key]}
+              {rebuttal[key] || ""}
             </p>
           </div>
         ))}

@@ -98,7 +98,8 @@ ${dissent.join("\n")}
 증거 반박: ${sixthRebuttal.evidenceRebuttal}
 가설 역전: ${sixthRebuttal.hypothesisReversal}
 편향 해체: ${sixthRebuttal.biasDeconstruction}
-근본 질문: ${sixthRebuttal.fundamentalQuestion}`
+근본 질문: ${sixthRebuttal.fundamentalQuestion}
+사멸 렌즈: ${sixthRebuttal.mortalityLens || "해당 없음"}`
 
   return chatCompletionJSON<ReportInsights>(systemPrompt, userMessage, {
     temperature: 0.6,

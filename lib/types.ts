@@ -71,6 +71,7 @@ export interface SixthRebuttal {
   hypothesisReversal: string
   biasDeconstruction: string
   fundamentalQuestion: string
+  mortalityLens: string
   fullText: string
 }
 

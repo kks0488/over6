@@ -98,7 +98,7 @@ ${prevContext}
       const content = await chatCompletion(
         philosopher.systemPrompt,
         userPrompt,
-        { temperature: 0.85, maxTokens: 512 }
+        { temperature: 0.85, maxTokens: 2048 }
       )
       const message = createMessage(philosopher, content, round, step)
       onMessage(message)
@@ -118,12 +118,12 @@ async function generateSummary(
     .map((m) => `[${m.speakerName}]: ${m.content}`)
     .join("\n\n")
 
-  const systemPrompt = `너는 철학 토론의 요약 전문가다.
-라운드 ${round}의 토론 내용을 간결하게 요약하라.
-각 참여자의 핵심 논점과 주요 대립 구도를 정리하라.
-200자 이내로 작성하라.`
+  const systemPrompt = `너는 철학 토론의 갈등 분석가다.
+라운드 ${round}에서 가장 날카로웠던 대립 2~3개를 뽑아라.
+각 대립에서 양측의 구체적 논거를 보존하라.
+합의된 부분보다 해결되지 않은 긴장을 우선하라.`
 
-  return chatCompletion(systemPrompt, context, { temperature: 0.5, maxTokens: 300 })
+  return chatCompletion(systemPrompt, context, { temperature: 0.5, maxTokens: 1024 })
 }
 
 async function extractConsensusAndDissent(

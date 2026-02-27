@@ -1,7 +1,7 @@
 import { runSixthAI } from "@/lib/ai/sixth-ai"
 import type { DebateMessage, SocratesMeta } from "@/lib/types"
 
-export const maxDuration = 60
+export const maxDuration = 300
 
 export async function POST(request: Request) {
   try {
