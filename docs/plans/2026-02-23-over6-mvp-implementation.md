@@ -20,7 +20,7 @@
 **Step 1: Next.js 프로젝트 초기화**
 
 ```bash
-cd /home/kkaemo/projects/over6
+cd over6
 npx create-next-app@latest . --typescript --tailwind --eslint --app --src=no --import-alias="@/*" --turbopack
 ```
 
@@ -53,7 +53,7 @@ npx shadcn@latest add button card input textarea toggle badge scroll-area progre
 **Step 4: .env.local 작성**
 
 ```env
-OPENAI_API_KEY=sk-8BQltULudxokgY6BAWyVyz6GJxtlHDQpn5ejtX5uO5s
+OPENAI_API_KEY=your-api-key
 OPENAI_BASE_URL=http://localhost:8317/v1
 OPENAI_MODEL=gpt-5.2
 OPENAI_MODEL_STRONG=gpt-5.3-codex

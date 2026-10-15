@@ -382,7 +382,7 @@ git commit -m "feat: 라운드 2에 자기비판 규칙 추가 — 반박 전 �
 ### Step 1: TypeScript 빌드 확인
 
 ```bash
-cd /home/kkaemo/projects/over6
+cd over6
 npx next build 2>&1 | head -50
 ```
 
